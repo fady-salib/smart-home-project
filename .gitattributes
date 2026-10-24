@@ -1,0 +1,5 @@
+# Normalise line endings: LF in the repo, whatever the platform wants on checkout
+* text=auto
+*.c    text eol=lf
+*.h    text eol=lf
+Makefile text eol=lf

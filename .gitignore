@@ -1,0 +1,22 @@
+# Build output (Eclipse AVR plugin + Makefile)
+Debug/
+Release/
+build/
+*.o
+*.d
+*.elf
+*.hex
+*.lss
+*.map
+*.eep
+
+# Eclipse workspace noise
+.metadata/
+.settings/*.log
+*.launch
+.externalToolBuilders/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
