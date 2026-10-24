@@ -1,0 +1,13 @@
+TMU/COTS/MCAL/SPI/SPI_program.o TMU/COTS/MCAL/SPI/SPI_program.o:  \
+ ../TMU/COTS/MCAL/SPI/SPI_program.c \
+  ../TMU/COTS/MCAL/SPI/../../LIB/STD_TYPES/STD_TYPES.h \
+  ../TMU/COTS/MCAL/SPI/../../LIB/BIT_MATH/BIT_MATH.h \
+  ../TMU/COTS/MCAL/SPI/SPI_interface.h ../TMU/COTS/MCAL/SPI/SPI_private.h
+
+../TMU/COTS/MCAL/SPI/../../LIB/STD_TYPES/STD_TYPES.h:
+
+../TMU/COTS/MCAL/SPI/../../LIB/BIT_MATH/BIT_MATH.h:
+
+../TMU/COTS/MCAL/SPI/SPI_interface.h:
+
+../TMU/COTS/MCAL/SPI/SPI_private.h:

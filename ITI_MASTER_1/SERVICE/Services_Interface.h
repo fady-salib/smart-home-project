@@ -1,0 +1,17 @@
+/*
+ * Services_Interface.c
+ *
+ *  Created on: Sep 5, 2023
+ *      Author: Hanos_000
+ */
+
+#ifndef SERVICE_SERVICES_INTERFACE_C_
+#define SERVICE_SERVICES_INTERFACE_C_
+
+void Set_Temp(u8 *Ptr_Temp); //FUNCTION TO SET THE TEMPERATURE (TURN AC OR HEATER/ NO ACTION) ACCORDING TO USER CHOICE
+
+void Temp_Monitoring(); //FUNCTION TO MONITOR THE AC / HEATER ACCORDING TO (Set_Temp ) FUNCTION VALUE
+
+void Void_LDR(); //FUNCTION TO INTI LDR SENOR
+
+#endif /* SERVICE_SERVICES_INTERFACE_C_ */

@@ -1,0 +1,19 @@
+TMU/COTS/HAL/LCD/LCD_Prog.o TMU/COTS/HAL/LCD/LCD_Prog.o:  \
+ ../TMU/COTS/HAL/LCD/LCD_Prog.c \
+  ../TMU/COTS/HAL/LCD/../../LIB/STD_TYPES/STD_TYPES.h \
+  ../TMU/COTS/HAL/LCD/../../LIB/BIT_MATH/BIT_MATH.h \
+  ../TMU/COTS/HAL/LCD/../../MCAL/DIO/DIO_Interface.h \
+  ../TMU/COTS/HAL/LCD/LCD_Private.h ../TMU/COTS/HAL/LCD/LCD_Config.h \
+  ../TMU/COTS/HAL/LCD/LCD_Interface.h
+
+../TMU/COTS/HAL/LCD/../../LIB/STD_TYPES/STD_TYPES.h:
+
+../TMU/COTS/HAL/LCD/../../LIB/BIT_MATH/BIT_MATH.h:
+
+../TMU/COTS/HAL/LCD/../../MCAL/DIO/DIO_Interface.h:
+
+../TMU/COTS/HAL/LCD/LCD_Private.h:
+
+../TMU/COTS/HAL/LCD/LCD_Config.h:
+
+../TMU/COTS/HAL/LCD/LCD_Interface.h:

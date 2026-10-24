@@ -1,5 +1,2 @@
-# Normalise line endings: LF in the repo, whatever the platform wants on checkout
+# Auto detect text files and perform LF normalization
 * text=auto
-*.c    text eol=lf
-*.h    text eol=lf
-Makefile text eol=lf
