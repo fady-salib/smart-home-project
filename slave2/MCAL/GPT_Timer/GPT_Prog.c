@@ -23,7 +23,7 @@ void GPT_Init(GPT_stConfig *Copy_stConfig)
 		{
 			CLR_BIT(Timer_TCCR0_REG, TCCR0_WGM00_BIT);
 			CLR_BIT(Timer_TCCR0_REG, TCCR0_WGM01_BIT);
-			Timer_TCCR0_REG |= Copy_stConfig->GPT_Prescaler;
+			Timer_TCCR0_REG = (Timer_TCCR0_REG & 0xF8u) | Copy_stConfig->GPT_Prescaler;
 			Timer_TCNT0_REG = Copy_stConfig->GPT_Preload;
 			Global_Timer0_CBF = Copy_stConfig->GPT_OVF_CBF;
 			SET_BIT(Timer_TIMSK_REG, TIMSK_TOIE0_BIT);
@@ -33,7 +33,7 @@ void GPT_Init(GPT_stConfig *Copy_stConfig)
 		{
 			CLR_BIT(Timer_TCCR0_REG, TCCR0_WGM00_BIT);
 			SET_BIT(Timer_TCCR0_REG, TCCR0_WGM01_BIT);
-			Timer_TCCR0_REG |= Copy_stConfig->GPT_Prescaler;
+			Timer_TCCR0_REG = (Timer_TCCR0_REG & 0xF8u) | Copy_stConfig->GPT_Prescaler;
 			Timer_OCR0_REG = Copy_stConfig->GPT_COM_Value;
 			Global_Timer0_CBF = Copy_stConfig->GPT_OVF_CBF;
 			SET_BIT(Timer_TIMSK_REG, TIMSK_OCIE0_BIT);

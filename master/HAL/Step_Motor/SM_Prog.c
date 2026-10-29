@@ -17,8 +17,11 @@ void Init_SM(SM_st *Copy_SM_st)
 	DIO_VoidSetPinValue(Copy_SM_st->SM_Port, Copy_SM_st->Yellow_Pin, DIO_u8PIN_LOW);
 	DIO_VoidSetPinValue(Copy_SM_st->SM_Port, Copy_SM_st->Orange_Pin, DIO_u8PIN_LOW);
 	
-	u8 i, j;
-	DIO_VoidSetPortDirection(Copy_SM_st->SM_Port, DIO_u8PORT_OUTPUT);
+	u32 j;
+	DIO_VoidSetPinDirection(Copy_SM_st->SM_Port, Copy_SM_st->Blue_Pin, DIO_u8PIN_OUTPUT);
+    DIO_VoidSetPinDirection(Copy_SM_st->SM_Port, Copy_SM_st->Pink_Pin, DIO_u8PIN_OUTPUT);
+    DIO_VoidSetPinDirection(Copy_SM_st->SM_Port, Copy_SM_st->Yellow_Pin, DIO_u8PIN_OUTPUT);
+    DIO_VoidSetPinDirection(Copy_SM_st->SM_Port, Copy_SM_st->Orange_Pin, DIO_u8PIN_OUTPUT);
 	if (Copy_SM_st->Step_Type == Full_Step)
 	{
 		if (Copy_SM_st->SM_Direction == Counter_Clock_Wise)

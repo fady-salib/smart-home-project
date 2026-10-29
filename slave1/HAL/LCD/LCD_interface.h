@@ -30,14 +30,14 @@ void LCD_ClearDisplay(void);
 void LCD_WriteCommand(u8 Copy_u8Command);
 u8 	 LCD_WriteChar(u8 Copy_u8Char);
 void LCD_WriteData(u8 Copy_u8Data);
-void LCD_WriteString(u8 *Copy_u8PtrString);
+void LCD_WriteString(const char *Copy_u8PtrString);
 u8 LCD_GoTo(u8 Copy_u8Line, u8 Copy_u8Cell);
 s32 LCD_WriteNumber(s32 Copy_s32Num);
 u8 LCD_WriteFloat(u16 Copy_u16Num);
 u8 LCD_GoToWriteNumber(u8 Copy_u8Line, u8 Copy_u8Cell, u8 Copy_s32Num);
 u8 LCD_GoToClear(u8 Copy_u8Line, u8 Copy_u8Cell, u8 Copy_u8NumCells);
 u8 LCD_GoToWriteChar(u8 Copy_u8Line, u8 Copy_u8Cell, u8 Copy_u8Char);
-u8 LCD_GoToWriteString(u8 Copy_u8Line, u8 Copy_u8Cell, const u8 *Copy_u8PtrString);
+u8 LCD_GoToWriteString(u8 Copy_u8Line, u8 Copy_u8Cell, const char *Copy_u8PtrString);
 void LCD_BCD_To_Char(u8 Copy_u8Data);
 u8 LCD_CreateCharacter(u8* Copy_u8P_Pattern, u8 Copy_Location);
 

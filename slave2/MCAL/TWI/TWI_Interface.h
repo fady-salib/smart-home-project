@@ -29,6 +29,7 @@ void TWI_voidMasterWriteData(u8 Copy_u8SentData);
 void TWI_voidMasterReadData(u8 *Copy_u8ReceivedData);
 /*As Master Stop Condition*/
 void TWI_voidStopCond(void);
+u8 TWI_u8LastTransferOK(void);
 u8   TWI_GetStatus(u8 Copy_u8Status);
 
 #endif /* MCAL_TWI_TWI_INTERFACE_H_ */

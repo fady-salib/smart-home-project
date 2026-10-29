@@ -14,13 +14,15 @@
 #include"../MCAL/DIO/DIO_Interface.h"
 #include"../HAL/LCD/LCD_interface.h"
 #include"../TMU/TMU_Interface.h"
+#include "Security_Interface.h"
+#include "Services_Interface.h"
 #include"../HAL/LM35/LM35_Interface.h"
 
-u8 Act_temp;
-u8 Temp;
+extern u8 Act_temp;
+extern u8 Temp;
 void InteractiveLCD()
 {
-	u8 temp;
+
 	u8 PIN_Start = 1;  //BUTTON TO INIT LCD
 
 	KP_stConfiguration KP1 =

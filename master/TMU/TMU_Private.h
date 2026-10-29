@@ -22,6 +22,8 @@ typedef struct
 {
 	void(*Pftask)(void);
 	u16 Periodicity;
+    u16 Remaining;
+    u8 Pending;
 	
 	enum_Task_State Task_State;
 }TCB_t ;

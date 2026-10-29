@@ -8,7 +8,7 @@
 #ifndef SERVICE_SECURITY_INTERFACE_H_
 #define SERVICE_SECURITY_INTERFACE_H_
 
-u16 arrayToNum(u16* arr, u16 length);
+u16 arrayToNum(u8* arr, u16 length);
 
 void Pass(void);  //Set Password
 

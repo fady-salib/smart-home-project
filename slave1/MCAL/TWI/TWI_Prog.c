@@ -5,105 +5,80 @@
  *      Author: M.H
  */
 #include "../../LIB/STD_TYPES.h"
-#include"../../LIB/BIT_MATH.h"
-
 #include "TWI_Private.h"
 #include "TWI_Interface.h"
 
+#define TWINT_MASK (1u << TWI_TWCR_TWINT_BIT)
+#define TWEN_MASK (1u << TWI_TWCR_TWEN_BIT)
+static u8 transfer_ok = 1;
 
-
-/*Initialize Master*/
-void TWI_voidMaterInit(u8 Copy_u8SlaveAddress)
+static void wait_status(u8 expected, u8 alternate)
 {
-	/*1-Choose Prescaler*/
-	TWI_TWBR_REG=(u8)(((FCPU/SCL)-16)/2);
-	/*2-Assign Slave Address*/
- TWI_TWAR_REG= (Copy_u8SlaveAddress<<1);
- 	 /*3-enable*/
- SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWEN_BIT);
+    u16 budget = 60000;
+    while (!(TWI_TWCR_REG & TWINT_MASK) && --budget) { }
+    u8 status = TWI_TWSR_REG & 0xF8u;
+    if (!budget || (status != expected && status != alternate)) transfer_ok = 0;
 }
-/*Initialize Slave*/
-void TWI_voidSlaveInit(u8 Copy_u8SlaveAddress){
-
-	/*2-Assign Slave Address*/
- TWI_TWAR_REG= (Copy_u8SlaveAddress<<1);
- 	 /*3-enable*/
- 	 SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWEN_BIT);
-}
-/*As Master Start Condition*/
-void TWI_voidStartCond(void){
-	CLR_BIT(TWI_TWCR_REG,TWI_TWCR_TWSTO_BIT);
-		/*1-Start Condition*/
-		SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWSTA_BIT);
-		/*2-CLEAR TWINT FLAG TO START OPERATION*/
-		SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT);
-		/*3-Wait until flag became 1*/
-		while(GET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT)==0);
-}
-/*As Master write Address on Bus*/
-void TWI_voidSendSlaveAddressWithRead(u8 Copy_u8SlaveAddressToSend){
-	/*Clear Start Condition*/
-	//CLR_BIT(TWI_TWCR_REG,TWI_TWCR_TWSTA_BIT);
-	/*1-Assign Slave address on data bus And setting bit to enable read*/
-	TWI_TWDR_REG=((Copy_u8SlaveAddressToSend<<1) |0x01);
-	/*2-Clear Flag To Start Operation*/
-	SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT);
-	/*3-Wait until flag became 1*/
-	while(GET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT)==0);
-}
-void TWI_voidSendSlaveAddressWithWrite(u8 Copy_u8SlaveAddressToSend){
-	/*Clear Start Condition*/
-	//CLR_BIT(TWI_TWCR_REG,TWI_TWCR_TWSTA_BIT);
-	/*1-Assign Slave address on data bus And setting bit to enable read*/
-	TWI_TWDR_REG=(Copy_u8SlaveAddressToSend<<1);
-	/*2-Clear Flag To Start Operation*/
-	SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT);
-	/*3-Wait until flag became 1*/
-	while(GET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT)==0);
-}
-/*As Master Write Data On Bus*/
-void TWI_voidMasterWriteData(u8 Copy_u8SentData){
-	/*Assign Data to bus*/
-	TWI_TWDR_REG=Copy_u8SentData;
-	/*Clear Flag and wait*/
-	SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT);
-	/*3-Wait until flag became 1*/
-	while(GET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT)==0);
-}
-/*As Master Read Data On Bus*/
-void TWI_voidMasterReadData(u8 *Copy_u8ReceivedData){
-
-	/*1Enable ACK*/
-	SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWEA_BIT);
-	/*2-Clear Flag and wait*/
-	SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT);
-	/*3-Wait until flag became 1*/
-	while(GET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT)==0);
-	/*CHECK FOR ACK*/
-
-	*Copy_u8ReceivedData=TWI_TWDR_REG;
-}
-/*As Master Stop Condition*/
-void TWI_voidStopCond(void){
-	CLR_BIT(TWI_TWCR_REG,TWI_TWCR_TWSTA_BIT);
-  
-	/*1-Stop Condition*/
-	SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWSTO_BIT);
-	/*2-CLEAR TWINT FLAG TO START OPERATION*/
-	SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT);
-	/*3-Wait until flag became 1*/
-//	while(GET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT)==0);
-	
-}
-u8   TWI_GetStatus(u8 Copy_u8Status)
+u8 TWI_u8LastTransferOK(void) { return transfer_ok; }
+void TWI_voidMaterInit(u8 address)
 {
-    /*Get status*/
-    SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT);
-    SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWEA_BIT);
-    SET_BIT(TWI_TWCR_REG,TWI_TWCR_TWEN_BIT);
-    /*Busy wait for TWINT flag*/
-    while(!GET_BIT(TWI_TWCR_REG,TWI_TWCR_TWINT_BIT));
-    while((TWI_TWSR_REG & 0xF8) != Copy_u8Status);
-    return TWI_TWDR_REG;
+    TWI_TWSR_REG &= 0xFCu;
+    TWI_TWBR_REG = (u8)(((FCPU / SCL) - 16) / 2);
+    TWI_TWAR_REG = address << 1;
+    TWI_TWCR_REG = TWEN_MASK;
+    transfer_ok = 1;
 }
-/*USED DRIVER*/
+void TWI_voidSlaveInit(u8 address)
+{
+    TWI_TWAR_REG = address << 1;
+    TWI_TWCR_REG = TWEN_MASK;
+}
+void TWI_voidStartCond(void)
+{
+    transfer_ok = 1;
+    TWI_TWCR_REG = TWINT_MASK | TWEN_MASK | (1u << TWI_TWCR_TWSTA_BIT);
+    wait_status(0x08, 0x10);
+}
+void TWI_voidSendSlaveAddressWithWrite(u8 address)
+{
+    if (!transfer_ok) return;
+    TWI_TWDR_REG = address << 1;
+    TWI_TWCR_REG = TWINT_MASK | TWEN_MASK;
+    wait_status(0x18, 0x18);
+}
+void TWI_voidSendSlaveAddressWithRead(u8 address)
+{
+    if (!transfer_ok) return;
+    TWI_TWDR_REG = (address << 1) | 1u;
+    TWI_TWCR_REG = TWINT_MASK | TWEN_MASK;
+    wait_status(0x40, 0x40);
+}
+void TWI_voidMasterWriteData(u8 data)
+{
+    if (!transfer_ok) return;
+    TWI_TWDR_REG = data;
+    TWI_TWCR_REG = TWINT_MASK | TWEN_MASK;
+    wait_status(0x28, 0x28);
+}
+void TWI_voidMasterReadData(u8 *data)
+{
+    if (!data) return;
+    *data = 0xFF;
+    if (!transfer_ok) return;
+    /* Single final byte is NACKed; TWINT is write-one-to-clear. */
+    TWI_TWCR_REG = TWINT_MASK | TWEN_MASK;
+    wait_status(0x58, 0x58);
+    if (transfer_ok) *data = TWI_TWDR_REG;
+}
+void TWI_voidStopCond(void)
+{
+    TWI_TWCR_REG = TWINT_MASK | TWEN_MASK | (1u << TWI_TWCR_TWSTO_BIT);
+    u16 budget = 60000;
+    while ((TWI_TWCR_REG & (1u << TWI_TWCR_TWSTO_BIT)) && --budget) { }
+    if (!budget) transfer_ok = 0;
+}
+u8 TWI_GetStatus(u8 status)
+{
+    wait_status(status, status);
+    return transfer_ok ? TWI_TWDR_REG : 0xFF;
+}

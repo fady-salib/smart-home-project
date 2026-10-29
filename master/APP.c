@@ -15,7 +15,7 @@
 
 //APP LAYER OF MICROCONTROLLER 1
 
-void main()
+int main(void)
 {
 
 	Pass();

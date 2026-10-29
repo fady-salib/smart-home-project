@@ -14,6 +14,7 @@
 //#include "../../HAL/LCD/LCD_private.h"
 
 #include <util/delay.h>
+#include "../../../common/HomeLogic.h"
 
 /* ====================== Functions Definitions ===================== */
 void LCD_Init(void)
@@ -104,7 +105,7 @@ void LCD_WriteData(u8 Copy_u8Data)
 	_delay_ms(1);
 
 }
-void LCD_WriteString ( u8 *Copy_u8PtrString)
+void LCD_WriteString (const char *Copy_u8PtrString)
 {
 	u8 i=0;
 	while(Copy_u8PtrString[i] !='\0')
@@ -151,54 +152,13 @@ u8	LCD_WriteChar(u8 Copy_u8Char)
 	LCD_WriteData(Copy_u8Char);
 	return Ret;
 }
-s32 LCD_WriteNumber(s32 Copy_s32Num)
+s32 LCD_WriteNumber(s32 number)
 {
-	u8 Ret = E_OK;
-
-	u8 iterator = 0 ,Rem = 0;
-	u8 Str[100];
-
-	/* if the user send 0 */
-	if(Copy_s32Num == 0)
-	{
-		LCD_WriteChar('0');
-		_delay_ms(1);
-		return Ret;
-	}
-
-	/* if the user send negative number */
-	if(Copy_s32Num < 0)
-	{
-		Copy_s32Num *= -1;
-		LCD_WriteChar('-');
-	}
-
-	/* Convert the number to string "But Reversed" */
-	while(Copy_s32Num > 0)
-	{
-		/* Getting Remainder "Last Digit" */
-		Rem = Copy_s32Num % 10;
-
-		/* Assigning the Last Digit to the String */
-		Str[iterator] = Rem + '0';
-		/* Increasing the iterator of the string */
-		iterator++;
-
-		/* Deleting the last digit from the number */
-		Copy_s32Num /= 10;
-	}
-
-	/* Printing every character of the string */
-	/* In a reverse order because the array was reversed already */
-	for(; iterator>0 ; iterator--)
-	{
-		LCD_WriteChar(Str[iterator-1]);
-		_delay_us(1);
-	}
-
-	return Ret;
+    char text[12];
+    home_format_i32(number, text);
+    LCD_WriteString(text);
+    return E_OK;
 }
-
 
 u8 LCD_GoToWriteNumber(u8 Copy_u8Line, u8 Copy_u8Cell, u8 Copy_s32Num)
 {
@@ -234,7 +194,7 @@ u8 LCD_GoToWriteChar(u8 Copy_u8Line, u8 Copy_u8Cell, u8 Copy_u8Char)
 }
 
 
-u8 LCD_GoToWriteString(u8 Copy_u8Line, u8 Copy_u8Cell, const u8 *Copy_u8PtrString)
+u8 LCD_GoToWriteString(u8 Copy_u8Line, u8 Copy_u8Cell, const char *Copy_u8PtrString)
 {
 	u8 Ret = E_OK;
 

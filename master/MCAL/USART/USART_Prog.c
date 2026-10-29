@@ -38,18 +38,11 @@ void USART_voidRecieve(u8 *Copy_ptu8DataSent){
 
 	*Copy_ptu8DataSent=USART_UDR_REG;
 }
-void USART_voidSendString(u8* Copy_pu8String)
+void USART_voidSendString(u8 *text)
 {
-
-	u8 i;
-	while (Copy_pu8String[i] != '\0')
-	    {
-		USART_voidTransmit(Copy_pu8String[i++]);
-	    }
+    if (!text) return;
+    while (*text) USART_voidTransmit(*text++);
 }
-
-
-
 
 void USART_voidDisable(void)
 {

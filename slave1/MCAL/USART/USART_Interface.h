@@ -10,7 +10,7 @@
 
 void USART_voidInit(void);
 void USART_voidTransmit(u8 Copy_u8Data);
-void USART_u8Recieve(u8 *Copy_ptu8DataSent);
+void USART_voidRecieve(u8 *Copy_ptu8DataSent);
 void USART_voidSendString(u8* Copy_pu8String);
 void USART_voidDisable(void);
 

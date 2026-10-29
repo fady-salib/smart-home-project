@@ -13,10 +13,13 @@
 #include"../HAL/LM35/LM35_Interface.h"
 
 u8 Temp; //GLOBAL LM35 TEMPERATURE VALUE
-extern u8 Act_temp = 0; //TEMPERATURE ENTERED BY USER
+u8 Act_temp = 0; //TEMPERATURE ENTERED BY USER
+
+static u8 temperature_configured = 0;
 
 void Set_Temp(u8 *Ptr_Temp)
 {
+    if (Ptr_Temp == NULL) return;
 	KP_stConfiguration KP1 =
 	{ .KP_Colum1_PORT = DIO_u8PORTC, .KP_Colum2_PORT =
 	DIO_u8PORTC, .KP_Colum3_PORT = DIO_u8PORTC, .KP_Row1_PORT = DIO_u8PORTC, .KP_Row2_PORT = DIO_u8PORTC,
@@ -31,13 +34,13 @@ void Set_Temp(u8 *Ptr_Temp)
 	u8 key_pressed;
 	u8 arr[2] =
 	{ 0, 0 }; // ARRAY TO SAVE TEMPERATURE VALUE
-	u8 LM35_VAL = 0;
+
 	LCD_WriteString("Set Temp:");
 	LCD_GoToWriteChar(0, 11, 'C');
 	while (counter < 2)
 	{
 		key_pressed = 0xFF; //return the variable that holds the pressed key from keypad to its initial value
-		while (key_pressed == 0xFF) //repeat till the user press any key
+		while (key_pressed > 9) //repeat till the user press any key
 		{
 			key_pressed = Read_KP(&KP1); //if the user pressed any button in keypad save the value in key_pressed
 		}
@@ -49,7 +52,8 @@ void Set_Temp(u8 *Ptr_Temp)
 		counter++;
 
 	}
-	*Ptr_Temp = arr[0] * 10 + arr[1]; //MERGE THE TWO NUMBERS OF ARRAY
+	*Ptr_Temp = arr[0] * 10 + arr[1];
+    temperature_configured = 1; //MERGE THE TWO NUMBERS OF ARRAY
 
 }
 
@@ -59,7 +63,12 @@ void Temp_Monitoring() //MONITOR THE TEMPERATURE BY CONTROL AC / HEATER
 	DIO_VoidSetPinDirection(DIO_u8PORTB,DIO_u8PIN6,DIO_u8PIN_OUTPUT);
 	DIO_VoidSetPinDirection(DIO_u8PORTB,DIO_u8PIN7,DIO_u8PIN_OUTPUT);
 	
-	LM35_voidReadValue(DIO_u8PIN0,&Temp);
+	    if (!temperature_configured) {
+        DIO_VoidSetPinValue(DIO_u8PORTB, DIO_u8PIN6, DIO_u8PIN_LOW);
+        DIO_VoidSetPinValue(DIO_u8PORTB, DIO_u8PIN7, DIO_u8PIN_LOW);
+        return;
+    }
+    LM35_voidReadValue(DIO_u8PIN0,&Temp);
 	
 	if ( Temp == Act_temp )
 	{
@@ -80,22 +89,13 @@ void Temp_Monitoring() //MONITOR THE TEMPERATURE BY CONTROL AC / HEATER
 	
 	
 }
-void Void_LDR() //MONITOR LED ACCORDING TO LIGHT
+void Void_LDR(void)
 {
-	LCD_Init();
-	u16 Read_LDR = 0;
-	ADC_voidInit();
-	DIO_VoidSetPinDirection(DIO_u8PORTB, DIO_u8PIN3, DIO_u8PIN_OUTPUT);
-		ADC_StartConv(ADC_CHANNEL3, &Read_LDR);
-		if ((Read_LDR / 204.8) <= 5 && (Read_LDR / 204.8) > 3) {	
-
-			DIO_VoidSetPinValue(DIO_u8PORTB, DIO_u8PIN3, DIO_u8PIN_HIGH);
-		}
-
-		else if ((Read_LDR / 204.8) <= 3 && (Read_LDR / 204.8) > 0) {
-		
-			DIO_VoidSetPinValue(DIO_u8PORTB, DIO_u8PIN3, DIO_u8PIN_LOW);
-
-		}
-
+    u16 raw = 0;
+    ADC_voidInit();
+    DIO_VoidSetPinDirection(DIO_u8PORTB, DIO_u8PIN3, DIO_u8PIN_OUTPUT);
+    ADC_StartConv(ADC_CHANNEL3, &raw);
+    /* Preserve the original >3 V policy at assumed 5 V ADC reference.
+     * The actual light/dark polarity depends on divider wiring. */
+    DIO_VoidSetPinValue(DIO_u8PORTB, DIO_u8PIN3, raw > 614 ? DIO_u8PIN_HIGH : DIO_u8PIN_LOW);
 }

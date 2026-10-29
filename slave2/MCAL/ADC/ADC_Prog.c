@@ -27,12 +27,12 @@ void ADC_voidInit(void){
 
 }
 void ADC_StartConv(u8 Copy_u8SelectedChannel,u16 *Copy_pu16Return){
-	if(Copy_u8SelectedChannel<=ADC_CHANNEL7){
+	if(Copy_pu16Return != NULL && Copy_u8SelectedChannel<=ADC_CHANNEL7){
 		/*1-Select Channel*/
-		ADC_ADMUX_REG|=Copy_u8SelectedChannel;
+		ADC_ADMUX_REG = (ADC_ADMUX_REG & 0xE0u) | Copy_u8SelectedChannel;
 		SET_BIT(ADC_ADCSRA_REG,ADC_ADCSRA_ADCSC_BIT);
-		while(GET_BIT(ADC_ADCSRA_REG,ADC_ADCSRA_ADCSC_BIT)==1);
-		      *Copy_pu16Return=(ADC_ADCL_REG|(ADC_ADCH_REG<<8));
+		while(GET_BIT(ADC_ADCSRA_REG,ADC_ADCSRA_ADCSC_BIT)==1) { }
+		*Copy_pu16Return=(ADC_ADCL_REG|(ADC_ADCH_REG<<8));
 		}
 		else
 		{
@@ -41,15 +41,13 @@ void ADC_StartConv(u8 Copy_u8SelectedChannel,u16 *Copy_pu16Return){
 
 }
 
-void ADC_READ_PER(u8 Copy_u8Pin,u8 *Copy_u16value)
+/* Historical helper returns a coarse 0..100 percent ADC scale. */
+void ADC_READ_PER(u8 pin, u8 *value)
 {
-	DIO_VoidSetPinDirection(DIO_u8PORTA,Copy_u8Pin,DIO_u8PIN_INPUT);
-	ADC_voidInit();
-	ADC_StartConv(Copy_u8Pin,Copy_u16value);
-
-    u16 MilliVolt = ( ((u32)Copy_u16value * 5000UL) / 1023 ) ;
-
-    
+    u16 raw = 0;
+    if (value == NULL) return;
+    DIO_VoidSetPinDirection(DIO_u8PORTA, pin, DIO_u8PIN_INPUT);
+    ADC_voidInit();
+    ADC_StartConv(pin, &raw);
+    *value = (u8)(((u32)raw * 100u) / 1023u);
 }
-/*USED DRIVER*/
-

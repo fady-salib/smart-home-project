@@ -5,15 +5,18 @@
  *      Author: Hanos_000
  */
 #include"../LIB/STD_TYPES.h"
+#include "../../common/HomeLogic.h"
 #include"../LIB/BIT_MATH.h"
 #include<util/delay.h>
 #include "../HAL/Key_Pad/KP_Interface.h"
 #include "../HAL/Key_Pad/KP_Private.h"
 #include"../HAL/Step_Motor/SM_Interface.h"
 #include"../HAL/EEPROM/EEPROM_Interface.h"
+#include "../MCAL/TWI/TWI_Interface.h"
 #include"../MCAL/DIO/DIO_Interface.h"
 #include"../HAL/LCD/LCD_interface.h"
 #include"../MCAL/USART/USART_Interface.h"
+#include "Services_Interface.h"
 
 
 /* KEYPAD TO ENTER PASSWORD */
@@ -28,14 +31,11 @@ DIO_u8PORTA, .KP_Colum3_PORT = DIO_u8PORTA,.KP_Row1_PORT = DIO_u8PORTA, .KP_Row2
 
 
 /* FUNCTION TO CONVERT ARRAY TO NUM */
-u16 arrayToNum(u16* arr, u16 length)
+u16 arrayToNum(u8 *arr, u16 length)
 {
-	u16 num = 0;
-	for (u8 i = 0; i < length; i++)
-	{
-		num = num * 10 + arr[i];
-	}
-	return num;
+    uint16_t value = 0;
+    if (length > 4 || !home_digits_to_u16(arr, (uint8_t)length, &value)) return 0;
+    return value;
 }
 /* FUNCTION TO SET AND COMPARE PASSWORD */
 
@@ -46,8 +46,8 @@ void Pass(void)
 
 	u16 num;
 	u8 Flag, i;
-	u16 MultiArr[4] =
-	{ 1000, 100, 10, 1 };  //ARRAY TO STORE USER PASSWORD
+	u8 MultiArr[4] =
+	{ 0, 0, 0, 0 };  //ARRAY TO STORE USER PASSWORD
 	Flag = 0;
 	Init_KP(&KP1);
 //USER SET PASSWORD
@@ -56,7 +56,7 @@ void Pass(void)
 	while (Flag < 4) //loop till the user finish inserting the pass
 	{
 		u8 key_pressed = 0xFF; //return the variable that holds the pressed key from keypad to its initial value
-		while (key_pressed == 0xFF) //repeat till the user press any key
+		while (key_pressed > 9) //repeat till the user press any key
 		{
 
 			key_pressed = Read_KP(&KP1); //if the user pressed any button in keypad save the value in key_pressed
@@ -76,23 +76,29 @@ void Pass(void)
 	u8 last4digits = Pass % 100;
 
 	TWI_voidMaterInit(0x01);
-	EEPROM_voidSendData(0x1234, first4digits);
-	EEPROM_voidRecieveData(0x1234, &first4digits);
-	EEPROM_voidSendData(0x1245, last4digits);
-	EEPROM_voidRecieveData(0x1245, &last4digits);
+	EEPROM_voidSendData(HOME_PIN_HIGH_ADDRESS, first4digits);
+	EEPROM_voidRecieveData(HOME_PIN_HIGH_ADDRESS, &first4digits);
+	EEPROM_voidSendData(HOME_PIN_LOW_ADDRESS, last4digits);
+	EEPROM_voidRecieveData(HOME_PIN_LOW_ADDRESS, &last4digits);
+    if (first4digits > 99 || last4digits > 99 ||
+        (u16)first4digits * 100u + last4digits != Pass) {
+        LCD_ClearDisplay();
+        LCD_WriteString("EEPROM ERROR");
+        return; /* never unlock when provisioning readback fails */
+    }
 //User Compare Password
 
 	LCD_GoToWriteString(0, 0, " Enter Password");
 	Flag = 0;
 	u16 com_num;
-	u16 MultiArr2[4] =
-	{ 1000, 100, 10, 1 };
+	u8 MultiArr2[4] =
+	{ 0, 0, 0, 0 };
 	u8 Num_of_tries = 0;
-	u8 Pass_Correct = 0;
+
 	while (Flag < 4) //loop till the user finish inserting the pass
 	{
 		u8 key_pressed = 0xFF; //return the variable that holds the pressed key from keypad to its initial value
-		while (key_pressed == 0xFF) //repeat till the user press any key
+		while (key_pressed > 9) //repeat till the user press any key
 		{
 
 			key_pressed = Read_KP(&KP1); //if the user pressed any button in keypad save the value in key_pressed
@@ -112,7 +118,7 @@ void Pass(void)
 		while (Flag < 4) //loop till the user finish inserting the pass
 		{
 			u8 key_pressed = 0xFF; //return the variable that holds the pressed key from keypad to its initial value
-			while (key_pressed == 0xFF) //repeat till the user press any key
+			while (key_pressed > 9) //repeat till the user press any key
 			{
 
 				key_pressed = Read_KP(&KP1); //if the user pressed any button in keypad save the value in key_pressed
@@ -129,8 +135,8 @@ void Pass(void)
 		u8 z, y;
 		u16 TotPass;
 
-		EEPROM_voidRecieveData(0x1234, &z);
-		EEPROM_voidRecieveData(0x1245, &y);
+		EEPROM_voidRecieveData(HOME_PIN_HIGH_ADDRESS, &z);
+		EEPROM_voidRecieveData(HOME_PIN_LOW_ADDRESS, &y);
 		TotPass = z * 100 + y;  //MERGE LAST TWO AND  FIRST TWO DIGITS OF PASSWORD 
 
 		if (com_num == TotPass) //COMPARE BETWEEN SAVED AND USER PASSWORD
@@ -163,7 +169,7 @@ void Pass(void)
 			
 			//INIT USART TO TRANSMIT A FLAG TO INIT MICROCONTROLLER 2
 			
-				DIO_VoidSetPinDirection(DIO_u8PORTD, DIO_u8PIN0, DIO_u8PIN_OUTPUT);
+				DIO_VoidSetPinDirection(DIO_u8PORTD, DIO_u8PIN0, DIO_u8PIN_INPUT);
 				DIO_VoidSetPinDirection(DIO_u8PORTD, DIO_u8PIN1, DIO_u8PIN_OUTPUT);
 				DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN2, DIO_u8PIN_LOW);  
 				USART_voidInit();

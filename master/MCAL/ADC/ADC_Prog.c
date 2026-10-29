@@ -26,12 +26,12 @@ void ADC_voidInit(void){
 
 }
 void ADC_StartConv(u8 Copy_u8SelectedChannel,u16 *Copy_pu16Return){
-	if(Copy_u8SelectedChannel<=ADC_CHANNEL7){
+	if(Copy_pu16Return != NULL && Copy_u8SelectedChannel<=ADC_CHANNEL7){
 		/*1-Select Channel*/
-		ADC_ADMUX_REG|=Copy_u8SelectedChannel;
+		ADC_ADMUX_REG = (ADC_ADMUX_REG & 0xE0u) | Copy_u8SelectedChannel;
 		SET_BIT(ADC_ADCSRA_REG,ADC_ADCSRA_ADCSC_BIT);
-		while(GET_BIT(ADC_ADCSRA_REG,ADC_ADCSRA_ADCSC_BIT)==1);
-		      *Copy_pu16Return=(ADC_ADCL_REG|(ADC_ADCH_REG<<8));
+		while(GET_BIT(ADC_ADCSRA_REG,ADC_ADCSRA_ADCSC_BIT)==1) { }
+		*Copy_pu16Return=(ADC_ADCL_REG|(ADC_ADCH_REG<<8));
 		}
 		else
 		{

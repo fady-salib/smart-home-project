@@ -5,6 +5,7 @@
 // *      Author: Hanos_000
 // */
 #include"LIB/STD_TYPES.h"
+#include "HAL/LCD/LCD_interface.h"
 #include"LIB/BIT_MATH.h"
 #include"SERVICE/Security_Interface.h"
 #include"SERVICE/InteractiveLCD_Interface.h"
@@ -19,12 +20,12 @@
 
 
 
-void main()
+int main(void)
 {
 	LCD_Init();
 	u8 Start_U2;
 	DIO_VoidSetPinDirection(DIO_u8PORTD, DIO_u8PIN0, DIO_u8PIN_INPUT);
-	DIO_VoidSetPinDirection(DIO_u8PORTD, DIO_u8PIN1, DIO_u8PIN_INPUT);
+	DIO_VoidSetPinDirection(DIO_u8PORTD, DIO_u8PIN1, DIO_u8PIN_OUTPUT);
 	DIO_VoidSetPinDirection(DIO_u8PORTD, DIO_u8PIN6, DIO_u8PIN_INPUT);
 	DIO_VoidSetPinValue(DIO_u8PORTD, DIO_u8PIN6, DIO_u8PIN_HIGH);
 	USART_voidInit();
@@ -144,7 +145,7 @@ while(1){
 //		EEPROM_voidRecieveData(0x1245, last4digits);
 //
 //	}
-//	void main()
+//	int main(void)
 //	{
 //u16 x;		
 //u16 *p = &x;

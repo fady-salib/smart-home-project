@@ -14,6 +14,7 @@
 
 
 void EEPROM_voidSendData(u16 Copy_u16Address,u8 Copy_u8Data){
+    if (Copy_u16Address > 0x07FFu) return;
 	/*1-Send Start Condition*/
 	TWI_voidStartCond();
 	/*2-Send (0,1,0,1,A2,b1,b0,w)*/
@@ -28,6 +29,9 @@ void EEPROM_voidSendData(u16 Copy_u16Address,u8 Copy_u8Data){
 }
 void EEPROM_voidRecieveData(u16 Copy_u16Address,u8 *Copy_u8ReceivedData)
 {
+    if (!Copy_u8ReceivedData) return;
+    *Copy_u8ReceivedData = 0xFF;
+    if (Copy_u16Address > 0x07FFu) return;
 
 
 	/*1-Send Start Condition*/

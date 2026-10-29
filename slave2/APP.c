@@ -5,6 +5,7 @@
 // *      Author: Hanos_000
 // */
 #include"LIB/STD_TYPES.h"
+#include "HAL/LCD/LCD_interface.h"
 #include"LIB/BIT_MATH.h"
 #include"MCAL/DIO/DIO_Interface.h"
 #include"HAL/Key_Pad/KP_Interface.h"
@@ -20,22 +21,24 @@
 
 
 
-void main()
+int main(void)
 {
-	
+
 	LCD_Init();
 		DIO_VoidSetPinDirection(DIO_u8PORTC,DIO_u8PIN0,DIO_u8PIN_INPUT);
 		DIO_VoidSetPinValue(DIO_u8PORTC,DIO_u8PIN0,DIO_u8PIN_HIGH);
 		LCD_Init();
-//USE RTOS TO CREATE TASK FOR TIMER 		
-TMU_CreateTask(TIMER,1000,0); 
-//USE RTOS TO CREATE TASK FOR SYSTEM TEMPERATURE STATE
-TMU_CreateTask(SystemState_Setter,50,1);
+//Cooperative periodic clock task
+TMU_CreateTask(TIMER,1000,2);
+//Cooperative temperature and clock-input tasks
+TMU_CreateTask(SystemState_Setter,50,0);
+TMU_CreateTask(Clock_Input,20,1);
 TMU_Start_Scheduler();
 while(1)
 {
+    TMU_Dispatch();
 
-	
+
 }
 }
 

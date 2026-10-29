@@ -14,10 +14,13 @@
 //#include<util/delay.h>
 u8 Temp;
 
-extern u8 Act_temp = 0; //USER TEMP
+u8 Act_temp = 0; //USER TEMP
+
+static u8 temperature_configured = 0;
 
 void Set_Temp(u8 *Ptr_Temp)
 {
+    if (Ptr_Temp == NULL) return;
 	
 	KP_stConfiguration KP1 =
 		{ .KP_Colum1_PORT = DIO_u8PORTD, .KP_Colum2_PORT =
@@ -34,13 +37,13 @@ void Set_Temp(u8 *Ptr_Temp)
 	u8 key_pressed;
 	u8 arr[2] =
 	{ 0, 0 }; // Buffer size adjusted to hold the LM35 value
-	u8 LM35_VAL = 0;
+
 	LCD_WriteString("Set Temp:");
 	LCD_GoToWriteChar(0, 11, 'C');
 	while (counter < 2)
 	{
 		key_pressed = 0xFF; //return the variable that holds the pressed key from keypad to its initial value
-		while (key_pressed == 0xFF) //repeat till the user press any key
+		while (key_pressed > 9) //repeat till the user press any key
 		{
 			key_pressed = Read_KP(&KP1); //if the user pressed any button in keypad save the value in key_pressed
 		}
@@ -53,6 +56,7 @@ void Set_Temp(u8 *Ptr_Temp)
 
 	}
 	*Ptr_Temp = arr[0] * 10 + arr[1];
+    temperature_configured = 1;
 
 }
 
@@ -66,7 +70,16 @@ void Temp_Monitoring() //MENTOR TEMPERATURE WITH AC/HEATER
 	DIO_VoidSetPinDirection(DIO_u8PORTA, DIO_u8PIN3, DIO_u8PIN_OUTPUT);
 	DIO_VoidSetPinDirection(DIO_u8PORTA, DIO_u8PIN4, DIO_u8PIN_OUTPUT);
 
-	LM35_voidReadValue(DIO_u8PIN0, &Temp);
+	    if (!temperature_configured) {
+        DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN3, DIO_u8PIN_LOW);
+        DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN4, DIO_u8PIN_LOW);
+        DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN6, DIO_u8PIN_LOW);
+        DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN7, DIO_u8PIN_LOW);
+        DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN3, DIO_u8PIN_LOW);
+        DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN4, DIO_u8PIN_LOW);
+        return;
+    }
+    LM35_voidReadValue(DIO_u8PIN0, &Temp);
 
 	if (Temp == Act_temp)
 	{
@@ -184,7 +197,8 @@ void SET_DEVICE(void) //FUNCTION TO CONTROL DEVICES
 						if (key_pressed == 1) //TURN AC ON
 						{
 
-							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN3,
+							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN4, DIO_u8PIN_LOW);
+                            DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN3,
 							DIO_u8PIN_HIGH);
 
 						}
@@ -215,7 +229,8 @@ void SET_DEVICE(void) //FUNCTION TO CONTROL DEVICES
 						if (key_pressed == 1) //TURN HEATER ON
 						{
 
-							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN4,
+							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN3, DIO_u8PIN_LOW);
+                            DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN4,
 							DIO_u8PIN_HIGH);
 
 						}
@@ -292,7 +307,8 @@ void SET_DEVICE(void) //FUNCTION TO CONTROL DEVICES
 						if (key_pressed == 1) //TURN AC ON
 						{
 
-							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN6,
+							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN7, DIO_u8PIN_LOW);
+                            DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN6,
 							DIO_u8PIN_HIGH);
 
 						}
@@ -323,7 +339,8 @@ void SET_DEVICE(void) //FUNCTION TO CONTROL DEVICES
 						if (key_pressed == 1) //TURN HEATER ON
 						{
 
-							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN7,
+							DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN6, DIO_u8PIN_LOW);
+                            DIO_VoidSetPinValue(DIO_u8PORTC, DIO_u8PIN7,
 							DIO_u8PIN_HIGH);
 
 						}
@@ -401,7 +418,8 @@ void SET_DEVICE(void) //FUNCTION TO CONTROL DEVICES
 						if (key_pressed == 1) //TURN AC ON
 						{
 
-							DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN3,
+							DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN4, DIO_u8PIN_LOW);
+                            DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN3,
 							DIO_u8PIN_HIGH);
 
 						}
@@ -432,7 +450,8 @@ void SET_DEVICE(void) //FUNCTION TO CONTROL DEVICES
 						if (key_pressed == 1) //TURN HEATER ON
 						{
 
-							DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN4,
+							DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN3, DIO_u8PIN_LOW);
+                            DIO_VoidSetPinValue(DIO_u8PORTA, DIO_u8PIN4,
 							DIO_u8PIN_HIGH);
 
 						}

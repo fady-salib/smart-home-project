@@ -15,6 +15,7 @@ void Temp_Monitoring();
 
 void SystemState_Setter(void);
 
-void TIMER(); //
+void TIMER(void);
+void Clock_Input(void); //
 
 #endif /* SERVICE_SERVICES_INTERFACE_C_ */

@@ -8,14 +8,15 @@
 #ifndef LIB_STD_TYPES_H_
 #define LIB_STD_TYPES_H_
 
-#define NULL ((void*)0x00)
-typedef unsigned char u8;
-typedef unsigned short int u16;
-typedef unsigned long int u32;
+#include <stdint.h>
+#include <stddef.h>
+typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
 
-typedef signed char s8;
-typedef signed short int s16;
-typedef signed long int s32;
+typedef int8_t s8;
+typedef int16_t s16;
+typedef int32_t s32;
 
 typedef float f32;
 typedef double f64;

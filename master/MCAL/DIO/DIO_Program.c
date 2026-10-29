@@ -64,7 +64,7 @@ void DIO_VoidSetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin, u8 Copy_u8Value)
 }
 void DIO_VoidGetPinValue(u8 Copy_u8Port, u8 Copy_u8Pin, u8 *Copy_Pu8Return)
 {
-	if ((Copy_u8Port <= DIO_u8PORTD) && (Copy_u8Pin <= DIO_u8PIN7))
+	if (Copy_Pu8Return != NULL && (Copy_u8Port <= DIO_u8PORTD) && (Copy_u8Pin <= DIO_u8PIN7))
      	{
 
 		   *Copy_Pu8Return=GET_BIT(*DIO_ArrpVu8_PIN[Copy_u8Port],Copy_u8Pin);
@@ -95,7 +95,7 @@ void DIO_VoidSetPortValue(u8 Copy_u8Port, u8 Copy_u8Value)
 {
 	if (Copy_u8Port <= DIO_u8PORTD)
 	{
-		*DIO_ArrpVu8_DDR[Copy_u8Port] = Copy_u8Value;
+		*DIO_ArrpVu8_PORT[Copy_u8Port] = Copy_u8Value;
 	}
 	else
 	{

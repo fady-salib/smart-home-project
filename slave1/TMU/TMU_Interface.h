@@ -8,7 +8,7 @@
 #ifndef COTS_5_RTOS_STACK_1__RTOS_TMU_INTERFACE_H_
 #define COTS_5_RTOS_STACK_1__RTOS_TMU_INTERFACE_H_
 
-void TMU_CreateTask(void(*Copy_ptr_Func), u16 Copy_Periodicity,u8 Copy_Priority);
+void TMU_CreateTask(void(*Copy_ptr_Func)(void), u16 Copy_Periodicity,u8 Copy_Priority);
 
 void TMU_Suspend_Task(u8 Copy_Priority);
 void TMU_Resume_Task(u8 Copy_Priority);
@@ -18,5 +18,6 @@ void TMU_Delete_Task(u8 Copy_Priority);
 
 
 void TMU_Start_Scheduler(void);
+void TMU_Dispatch(void); /* call repeatedly from the foreground */
 
 #endif /* COTS_5_RTOS_STACK_1__RTOS_TMU_INTERFACE_H_ */
